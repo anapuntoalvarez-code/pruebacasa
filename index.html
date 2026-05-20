@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Metaverso VR - Audio Individual</title>
+    <title>Metaverso VR - Rebobinado Automático</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     
     <style>
@@ -27,17 +27,27 @@
         document.getElementById('bienvenida').style.display = 'none';
       }
 
-      // 1. Componente de Teletransporte
+      // 1. Componente de Teletransporte con REBOBINADO AL VIAJAR
       AFRAME.registerComponent('teleport', {
         schema: { pos: {type: 'string'} },
         init: function () {
           this.el.addEventListener('click', () => {
+            // Movemos la cámara
             document.querySelector('#camera-rig').setAttribute('position', this.data.pos);
+            
+            // TRUCO DE REBOBINADO: Al cambiar de habitación, buscamos el vídeo,
+            // lo pausamos, lo silenciamos y lo devolvemos al segundo 0
+            let video = document.querySelector('#miVideoUnico');
+            if (video) {
+              video.pause();
+              video.muted = true;
+              video.currentTime = 0; // Rebobina al principio
+            }
           });
         }
       });
 
-      // 2. Componente de reproducción INDIVIDUAL con AUDIO ACTIVADO
+      // 2. Componente de reproducción individual con Audio
       AFRAME.registerComponent('play-on-click', {
         init: function () {
           this.el.addEventListener('click', () => {
@@ -56,31 +66,26 @@
             if (videoTarget && typeof videoTarget.play === 'function') {
               if (videoTarget.paused) {
                 
-                // --- TRUCO DE AUDIO INDIVIDUAL ---
-                // 1. Buscamos TODOS los vídeos de la página y los pausamos
+                // Pausamos y rebobinamos cualquier estado anterior antes de reproducir
                 document.querySelectorAll('video').forEach(v => {
                   v.pause();
                   v.muted = true;
                 });
 
-                // 2. Encendemos SOLO el vídeo al que le hemos hecho clic y le ACTIVAMOS el sonido
+                // Encendemos el vídeo con sonido
                 videoTarget.muted = false; 
-                videoTarget.play().then(() => {
-                  console.log("¡Reproduciendo este vídeo con sonido!");
-                }).catch(err => {
-                  // Si el navegador se pone estricto, reintentamos con un toque de volumen
+                videoTarget.play().catch(err => {
                   videoTarget.muted = false;
                   videoTarget.volume = 1.0;
                   videoTarget.play();
                 });
 
               } else {
-                // Si ya se estaba reproduciendo y le vuelves a dar, se pausa y se silencia
+                // Si el usuario vuelve a pinchar el mismo vídeo, se frena, se silencia y se reinicia
                 videoTarget.pause();
                 videoTarget.muted = true;
+                videoTarget.currentTime = 0; 
               }
-            } else {
-              console.error("No se pudo detectar el elemento de vídeo.");
             }
           });
         }
@@ -118,6 +123,7 @@
 
       <a-entity position="0 0 -50">
         <a-sky color="#1a331a"></a-sky>
+        
         <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-2 2 -4"></a-entity>
         <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="2 2 -4"></a-entity>
         
@@ -127,6 +133,7 @@
 
       <a-entity position="50 0 0">
         <a-sky color="#1a1a33"></a-sky>
+        
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-3 2 -4"></a-entity>
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 -4"></a-entity>
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="3 2 -4"></a-entity>
@@ -137,6 +144,7 @@
 
       <a-entity position="-50 0 0">
         <a-sky color="#331a1a"></a-sky>
+        
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 -4"></a-entity> 
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 4" rotation="0 180 0"></a-entity> 
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-4 2 0" rotation="0 90 0"></a-entity> 
