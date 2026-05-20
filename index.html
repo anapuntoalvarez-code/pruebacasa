@@ -2,32 +2,33 @@
 <html lang="es">
 <head>
     <meta charset="utf-8">
-    <title>Metaverso Educativo Inmersivo</title>
+    <title>Metaverso Educativo de Alta Estética</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     
     <style>
-        /* Pantalla de inicio elegante para activar audio y vídeo en Chrome */
+        /* Pantalla de inicio "Passionate Design" */
         #bienvenida {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, #2c3e50 0%, #000000 100%);
+            background: radial-gradient(circle, #1a1a2e 0%, #000000 100%);
             z-index: 9999;
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
-            color: white; font-family: sans-serif;
+            color: white; font-family: 'Segoe UI', sans-serif;
             text-align: center;
         }
         #btn-entrar {
-            padding: 20px 40px; font-size: 22px; 
-            background: #d4af37; /* Oro antiguo */
-            color: black; border: none; border-radius: 50px; cursor: pointer;
+            padding: 20px 50px; font-size: 24px; 
+            background: linear-gradient(45deg, #d4af37, #f1c40f);
+            color: #1a1a2e; border: none; border-radius: 50px; cursor: pointer;
             margin-top: 30px; font-weight: bold;
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
             transition: 0.3s;
         }
         #btn-entrar:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.9);
         }
     </style>
 
@@ -36,15 +37,12 @@
             document.getElementById('bienvenida').style.display = 'none';
         }
 
-        // 1. Componente de Teletransporte con rebobinado automático
+        // Teletransporte con rebobinado y limpieza de audio
         AFRAME.registerComponent('teleport', {
             schema: { pos: {type: 'string'} },
             init: function () {
                 this.el.addEventListener('click', () => {
-                    // Movemos al usuario de habitación
                     document.querySelector('#camera-rig').setAttribute('position', this.data.pos);
-                    
-                    // Al cambiar de sala, paramos el vídeo y lo reiniciamos a cero
                     let video = document.querySelector('#miVideoUnico');
                     if (video) { 
                         video.pause(); 
@@ -55,39 +53,20 @@
             }
         });
 
-        // 2. Componente de reproducción individual con sonido activo
+        // Reproductor con Audio Activado por clic
         AFRAME.registerComponent('play-on-click', {
             init: function () {
                 this.el.addEventListener('click', () => {
-                    let materialComponent = this.el.components.material;
-                    let videoTarget = materialComponent && materialComponent.texture ? materialComponent.texture.image : null;
-                    
-                    if (!videoTarget) {
-                        let srcAttribute = this.el.getAttribute('material') ? this.el.getAttribute('material').src : null;
-                        if (typeof srcAttribute === 'string') {
-                            videoTarget = document.querySelector(srcAttribute);
+                    let mat = this.el.components.material;
+                    let v = mat && mat.texture ? mat.texture.image : null;
+                    if (v) {
+                        if (v.paused) {
+                            document.querySelectorAll('video').forEach(vid => { vid.pause(); vid.muted = true; });
+                            v.muted = false;
+                            v.play();
                         } else {
-                            videoTarget = srcAttribute;
-                        }
-                    }
-                    
-                    if (videoTarget && typeof videoTarget.play === 'function') {
-                        if (videoTarget.paused) {
-                            // Pausamos cualquier vídeo que esté sonando de fondo antes
-                            document.querySelectorAll('video').forEach(v => { v.pause(); v.muted = true; });
-                            
-                            // Encendemos este cuadro específico con sonido
-                            videoTarget.muted = false;
-                            videoTarget.play().catch(err => {
-                                videoTarget.muted = false;
-                                videoTarget.volume = 1.0;
-                                videoTarget.play();
-                            });
-                        } else {
-                            // Si se vuelve a pinchar, se frena y se reinicia
-                            videoTarget.pause();
-                            videoTarget.muted = true;
-                            videoTarget.currentTime = 0;
+                            v.pause();
+                            v.currentTime = 0;
                         }
                     }
                 });
@@ -98,89 +77,106 @@
 <body>
 
     <div id="bienvenida">
-        <h1 style="font-size: 3em; letter-spacing: 4px; margin-bottom: 10px;">MUSEO DEL APRENDIZAJE</h1>
-        <p>Haz clic en el botón para activar los entornos multimedia y los permisos de audio.</p>
-        <button id="btn-entrar" onclick="iniciarExperiencia()">ENTRAR A LA EXPERIENCIA</button>
+        <h1 style="font-size: 3.5em; margin-bottom: 0px; color: #d4af37;">GALERÍA DE LAS ERAS</h1>
+        <p style="opacity: 0.8;">Un viaje inmersivo por el conocimiento</p>
+        <button id="btn-entrar" onclick="iniciarExperiencia()">EMPEZAR VIAJE</button>
     </div>
 
-    <a-scene cursor="rayOrigin: mouse">
+    <a-scene cursor="rayOrigin: mouse" shadow="type: pcfsoft">
         
         <a-assets>
             <video id="miVideoUnico" src="tema1.mp4" loop="true" crossorigin="anonymous" playsinline></video>
             
-            <img id="fondoHub" src="https://upload.wikimedia.org/wikipedia/commons/8/83/Eshkol_Power_Station_360_Degrees_Panorama_Pano01.jpg">
-            <img id="fondoAntiguo" src="https://upload.wikimedia.org/wikipedia/commons/e/e0/Inside_the_Batall%C3%B3n_de_Infanter%C3%ADa_Paracaidista_N%C2%BA_4_-_360_Panorama.jpg">
-            <img id="fondoModerno" src="https://upload.wikimedia.org/wikipedia/commons/1/1d/Interior_of_the_Stadtschloss_Berlin_360_degree_panorama.jpg">
-            <img id="fondoFuturo" src="https://upload.wikimedia.org/wikipedia/commons/4/47/A_360-degree_panorama_of_the_VLT_platform.jpg">
+            <img id="texPiedra" src="https://i.imgur.com/39V9vj0.jpg">
+            <img id="texMadera" src="https://i.imgur.com/AL9888V.jpg">
+            <img id="texMetal" src="https://i.imgur.com/6S30R3X.jpg">
             
-            <img id="texturaMadera" src="https://upload.wikimedia.org/wikipedia/commons/a/a2/Polyhaven_wood_table_02_diff_1k.jpg">
+            <img id="skyAntiguo" src="https://cdn.polyhaven.com/asset_img/primary/castle_perimeter.jpg?height=720">
+            <img id="skyModerno" src="https://cdn.polyhaven.com/asset_img/primary/museum_hall.jpg?height=720">
+            <img id="skyFuturo" src="https://cdn.polyhaven.com/asset_img/primary/solitude_interior.jpg?height=720">
         </a-assets>
 
         <a-entity id="camera-rig" position="0 0 0">
             <a-camera></a-camera>
         </a-entity>
 
-        <a-sky src="#fondoHub" rotation="0 -90 0"></a-sky>
-        
-        <a-entity position="-3 0 -5">
-            <a-text value="LENGUA" position="0 2.8 0" align="center" width="8" color="#d4af37" font="serif"></a-text>
-            <a-box width="2" height="3.5" depth="0.3" src="#texturaMadera" teleport="pos: 0 0 -50"></a-box>
-        </a-entity>
+        <a-light type="ambient" color="#bbb"></a-light>
+        <a-light type="directional" color="#fff" intensity="0.6" position="-1 2 1"></a-light>
 
-        <a-entity position="0 0 -5">
-            <a-text value="MATEMATICAS" position="0 2.8 0" align="center" width="8" color="#ffffff"></a-text>
-            <a-box width="2" height="3.5" depth="0.3" color="#ecf0f1" opacity="0.9" teleport="pos: 50 0 0">
-                <a-box width="1.8" height="3.3" depth="0.35" color="#3498db" wireframe="true"></a-box>
+        <a-sky color="#000"></a-sky>
+        <a-text value="ELABORA TU DESTINO" position="0 4 -6" align="center" width="10" color="#fff"></a-text>
+
+        <a-entity position="-4 0 -5" rotation="0 20 0">
+            <a-text value="LENGUA" position="0 3.2 0" align="center" width="7" color="#d4af37" font="serif"></a-text>
+            <a-box width="2.4" height="3.8" depth="0.4" src="#texPiedra" position="0 1.9 0"></a-box>
+            <a-box width="1.8" height="3.4" depth="0.5" src="#texMadera" teleport="pos: 0 0 -50" class="raycastable" position="0 1.7 0.1">
+                <a-light type="point" color="#ff9900" intensity="0.5" position="0 0 1"></a-light>
             </a-box>
         </a-entity>
 
-        <a-entity position="3 0 -5">
-            <a-text value="ROBOTICA" position="0 2.8 0" align="center" width="8" color="#00f2ff"></a-text>
-            <a-box width="2" height="3.5" depth="0.3" color="#111" metalness="0.8" teleport="pos: -50 0 0">
-                <a-entity geometry="primitive: plane; width: 1.9; height: 3.4" material="color: #00f2ff; opacity: 0.4; shader: flat" position="0 0 0.16"></a-entity>
+        <a-entity position="0 0 -6">
+            <a-text value="MATEMATICAS" position="0 3.2 0" align="center" width="7" color="#fff"></a-text>
+            <a-box width="2.2" height="3.8" depth="0.2" color="#ecf0f1" position="0 1.9 0"></a-box>
+            <a-box width="1.9" height="3.5" depth="0.3" color="#3498db" opacity="0.6" transparent="true" teleport="pos: 50 0 0" class="raycastable" position="0 1.75 0.1">
+                <a-box width="1.7" height="3.3" depth="0.05" color="#fff" wireframe="true"></a-box>
+            </a-box>
+        </a-entity>
+
+        <a-entity position="4 0 -5" rotation="0 -20 0">
+            <a-text value="ROBOTICA" position="0 3.2 0" align="center" width="7" color="#00f2ff"></a-text>
+            <a-box width="2.4" height="3.8" depth="0.4" src="#texMetal" color="#333" position="0 1.9 0"></a-box>
+            <a-box width="1.8" height="3.4" depth="0.5" color="#111" teleport="pos: -50 0 0" class="raycastable" position="0 1.7 0.1">
+                <a-plane width="1.6" height="3.2" position="0 0 0.26" material="color: #00f2ff; emissive: #00f2ff; emissiveIntensity: 5; opacity: 0.7"></a-plane>
             </a-box>
         </a-entity>
 
 
         <a-entity position="0 0 -50">
-            <a-sky src="#fondoAntiguo" rotation="0 45 0"></a-sky>
+            <a-sky src="#skyAntiguo"></a-sky>
+            <a-text value="BIBLIOTECA ANTIGUA DE LENGUA" position="0 5 -8" align="center" width="12" color="#d4af37"></a-text>
             
-            <a-text value="SALA DE LENGUA" position="0 4.5 -6" align="center" width="10" color="#d4af37" font="serif"></a-text>
-            
-            <a-entity geometry="primitive: box; width: 3.5; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-2.5 2.2 -5"></a-entity>
-            <a-entity geometry="primitive: box; width: 3.5; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="2.5 2.2 -5"></a-entity>
-            
-            <a-cone position="0 0.5 -3" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
-            <a-text value="VOLVER AL HUB" position="0 1.2 -3" align="center" width="4" color="#fff"></a-text>
+            <a-entity position="0 2.5 -7">
+                <a-box width="5.5" height="3.2" depth="0.2" src="#texMadera"></a-box>
+                <a-entity geometry="primitive: plane; width: 5; height: 2.8" material="src: #miVideoUnico; shader: flat" play-on-click position="0 0 0.15"></a-entity>
+            </a-entity>
+
+            <a-entity position="0 1 -4" teleport="pos: 0 0 0" class="raycastable">
+                <a-cone radius-bottom="0.4" height="0.6" color="#e74c3c" rotation="0 0 180"></a-cone>
+                <a-text value="SALIR AL HUB" position="0 0.8 0" align="center" width="5"></a-text>
+            </a-entity>
         </a-entity>
 
 
         <a-entity position="50 0 0">
-            <a-sky src="#fondoModerno"></a-sky>
+            <a-sky src="#skyModerno"></a-sky>
+            <a-text value="LABORATORIO DE MATEMATICAS" position="0 5 -8" align="center" width="12" color="#2c3e50"></a-text>
             
-            <a-text value="SALA DE MATEMATICAS" position="0 4.5 -6" align="center" width="10" color="#2c3e50"></a-text>
-            
-            <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-3.5 2.2 -5" rotation="0 15 0"></a-entity>
-            <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2.2 -5.5"></a-entity>
-            <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="3.5 2.2 -5" rotation="0 -15 0"></a-entity>
-            
-            <a-cone position="0 0.5 -3" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
-            <a-text value="VOLVER AL HUB" position="0 1.2 -3" align="center" width="4" color="#2c3e50"></a-text>
+            <a-entity position="0 2.5 -7">
+                <a-box width="5.2" height="3" depth="0.1" color="#fff" opacity="0.3"></a-box>
+                <a-entity geometry="primitive: plane; width: 5; height: 2.8" material="src: #miVideoUnico; shader: flat" play-on-click position="0 0 0.1"></a-entity>
+            </a-entity>
+
+            <a-entity position="0 1 -4" teleport="pos: 0 0 0" class="raycastable">
+                <a-cone radius-bottom="0.4" height="0.6" color="#e74c3c" rotation="0 0 180"></a-cone>
+                <a-text value="SALIR AL HUB" position="0 0.8 0" align="center" width="5" color="#000"></a-text>
+            </a-entity>
         </a-entity>
 
 
         <a-entity position="-50 0 0">
-            <a-sky src="#fondoFuturo" rotation="0 -90 0"></a-sky>
+            <a-sky src="#skyFuturo"></a-sky>
+            <a-text value="NUCLEO DE ROBOTICA" position="0 5 -8" align="center" width="12" color="#00f2ff"></a-text>
             
-            <a-text value="SALA DE ROBOTICA" position="0 4.5 -6" align="center" width="10" color="#00f2ff"></a-text>
-            
-            <a-entity geometry="primitive: box; width: 2.8; height: 1.8; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2.2 -5"></a-entity> 
-            <a-entity geometry="primitive: box; width: 2.8; height: 1.8; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2.2 5" rotation="0 180 0"></a-entity> 
-            <a-entity geometry="primitive: box; width: 2.8; height: 1.8; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-4.5 2.2 0" rotation="0 90 0"></a-entity> 
-            <a-entity geometry="primitive: box; width: 2.8; height: 1.8; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="4.5 2.2 0" rotation="0 -90 0"></a-entity> 
-            
-            <a-cone position="0 0.5 -3" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
-            <a-text value="VOLVER AL HUB" position="0 1.2 -3" align="center" width="4" color="#fff"></a-text>
+            <a-entity position="0 2.5 -7">
+                <a-entity geometry="primitive: plane; width: 5.2; height: 3" material="color: #00f2ff; wireframe: true" position="0 0 -0.1"></a-entity>
+                <a-entity geometry="primitive: plane; width: 5; height: 2.8" material="src: #miVideoUnico; shader: flat; opacity: 0.9" play-on-click position="0 0 0.05"></a-entity>
+                <a-light type="point" color="#00f2ff" intensity="0.8" position="0 0 1"></a-light>
+            </a-entity>
+
+            <a-entity position="0 1 -4" teleport="pos: 0 0 0" class="raycastable">
+                <a-cone radius-bottom="0.4" height="0.6" color="#e74c3c" rotation="0 0 180"></a-cone>
+                <a-text value="SALIR AL HUB" position="0 0.8 0" align="center" width="5" color="#fff"></a-text>
+            </a-entity>
         </a-entity>
 
     </a-scene>
