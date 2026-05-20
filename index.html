@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Metaverso de Habitaciones</title>
+    <title>Metaverso de Habitaciones Inteligente</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script>
-      // Teletransporte
+      // 1. Componente de Teletransporte
       AFRAME.registerComponent('teleport', {
         schema: { pos: {type: 'string'} },
         init: function () {
@@ -14,61 +14,82 @@
         }
       });
 
-     // Este es el nuevo código mejorado que vas a pegar
+      // 2. Componente de reproducción ULTRA SEGURO
       AFRAME.registerComponent('play-on-click', {
         init: function () {
           this.el.addEventListener('click', () => {
             let v = document.querySelector(this.el.getAttribute('src'));
             
-            // Forzamos el silencio para que el navegador no lo bloquee
-            v.muted = true; 
+            // Forzamos al navegador a entender que está silenciado y puede reproducirse
+            v.muted = true;
+            v.setAttribute('muted', 'true');
             
+            // El truco definitivo: si no arranca con .play(), lo "despertamos" refrescando el recurso
             if (v.paused) {
-              v.play().then(() => {
-                console.log("¡Vídeo reproduciéndose!");
-              }).catch(err => {
-                console.error("Error al reproducir:", err);
+              v.play().catch(() => {
+                v.load();
+                v.play();
               });
             } else {
               v.pause();
             }
           });
         }
-      }); 
+      });
     </script>
   </head>
   <body>
     <a-assets>
-      <video id="tema1.mp4" src="tema1.mp4" loop="true" crossorigin="anonymous" playsinline></video>
-      <video id="tema1.mp4" src="tema1.mp4" loop="true" crossorigin="anonymous" playsinline></video>
-      </a-assets>
+      <video id="miVideoUnico" src="tema1.mp4" loop="true" crossorigin="anonymous" playsinline muted="true" autoplay="true"></video>
+    </a-assets>
 
     <a-scene cursor="rayOrigin: mouse">
       <a-entity id="camera-rig" position="0 0 0"><a-camera></a-camera></a-entity>
 
       <a-sky color="#222"></a-sky>
+      
+      <a-text value="Verde" position="-2 2.5 -3" align="center"></a-text>
       <a-box position="-2 1.5 -3" color="green" teleport="pos: 0 0 -50"></a-box>
+      
+      <a-text value="Azul" position="0 2.5 -3" align="center"></a-text>
       <a-box position="0 1.5 -3" color="blue" teleport="pos: 50 0 0"></a-box>
+      
+      <a-text value="Roja" position="2 2.5 -3" align="center"></a-text>
       <a-box position="2 1.5 -3" color="red" teleport="pos: -50 0 0"></a-box>
 
       <a-entity position="0 0 -50">
         <a-sky color="#1a331a"></a-sky>
-        <a-video src="#tema1.mp4" play-on-click position="-2 2 -4" width="3" height="2"></a-video>
-        <a-video src="#tema1.mp4" play-on-click position="2 2 -4" width="3" height="2"></a-video>
-        <a-box position="0 1 4" color="black" teleport="pos: 0 0 0"></a-box> </a-entity>
+        
+        <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-2 2 -4"></a-entity>
+        <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="2 2 -4"></a-entity>
+        
+        <a-cone position="0 0.5 -3" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
+        <a-text value="SALIR AL HUB" position="0 1 -3" align="center" width="4" color="white"></a-text>
+      </a-entity>
 
       <a-entity position="50 0 0">
         <a-sky color="#1a1a33"></a-sky>
-        <a-video src="#tema1.mp4" play-on-click position="-3 2 -4" width="2" height="1.5"></a-video>
-        <a-video src="#tema1.mp4" play-on-click position="0 2 -4" width="2" height="1.5"></a-video>
-        <a-video src="#tema1.mp4" play-on-click position="3 2 -4" width="2" height="1.5"></a-video>
-        <a-box position="0 1 4" color="black" teleport="pos: 0 0 0"></a-box>
+        
+        <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-3 2 -4"></a-entity>
+        <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 -4"></a-entity>
+        <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="3 2 -4"></a-entity>
+        
+        <a-cone position="0 0.5 -3" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
+        <a-text value="SALIR AL HUB" position="0 1 -3" align="center" width="4" color="white"></a-text>
       </a-entity>
 
       <a-entity position="-50 0 0">
         <a-sky color="#331a1a"></a-sky>
-        <a-video src="#tema1.mp4" play-on-click position="0 2 -4" width="2" height="1.5"></a-video> <a-video src="#v2" play-on-click position="0 2 4" rotation="0 180 0" width="2" height="1.5"></a-video> <a-video src="#v1" play-on-click position="-4 2 0" rotation="0 90 0" width="2" height="1.5"></a-video> <a-video src="#v2" play-on-click position="4 2 0" rotation="0 -90 0" width="2" height="1.5"></a-video> <a-box position="2 1 2" color="black" teleport="pos: 0 0 0"></a-box>
+        
+        <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 -4"></a-entity> 
+        <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 4" rotation="0 180 0"></a-entity> 
+        <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-4 2 0" rotation="0 90 0"></a-entity> 
+        <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="4 2 0" rotation="0 -90 0"></a-entity> 
+        
+        <a-cone position="0 0.5 -2" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
+        <a-text value="SALIR AL HUB" position="0 1 -2" align="center" width="4" color="white"></a-text>
       </a-entity>
+
     </a-scene>
   </body>
 </html>
