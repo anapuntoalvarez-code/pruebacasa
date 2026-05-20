@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Metaverso con Desbloqueo de Chrome</title>
+    <title>Metaverso VR Corregido</title>
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     
     <style>
-      /* Estilo para el botón de bienvenida flotante */
       #bienvenida {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
@@ -23,19 +22,13 @@
     </style>
 
     <script>
-      // Función que se ejecuta al pulsar el botón verde
+      // Al pulsar el botón verde, solo ocultamos la pantalla. 
+      // Dejamos que A-Frame maneje los vídeos por separado para evitar el error de 'null'
       function iniciarExperiencia() {
-        // Ocultamos la pantalla de bienvenida
         document.getElementById('bienvenida').style.display = 'none';
-        
-        // "Despertamos" manualmente el vídeo del almacén para que Chrome le dé permiso
-        var v = document.querySelector('#miVideoUnico');
-        v.play().then(() => {
-          v.pause(); // Lo pausamos inmediatamente para que espere a que vayas a la habitación
-        }).catch(err => console.log("Chrome sigue protestando, pero ya tiene permiso"));
       }
 
-      // Componente de Teletransporte
+      // 1. Componente de Teletransporte
       AFRAME.registerComponent('teleport', {
         schema: { pos: {type: 'string'} },
         init: function () {
@@ -45,13 +38,25 @@
         }
       });
 
-      // Componente de reproducción al hacer clic dentro del 3D
+      // 2. Componente de reproducción corregido (sin romper la carga)
       AFRAME.registerComponent('play-on-click', {
         init: function () {
           this.el.addEventListener('click', () => {
-            let v = document.querySelector(this.el.getAttribute('src'));
-            v.muted = true;
-            if (v.paused) { v.play(); } else { v.pause(); }
+            let videoTarget = document.querySelector(this.el.getAttribute('src'));
+            
+            if (videoTarget) {
+              if (videoTarget.paused) {
+                videoTarget.play().catch(err => {
+                  console.log("Reintento de reproducción forzada por bloqueo");
+                  videoTarget.muted = true;
+                  videoTarget.play();
+                });
+              } else {
+                videoTarget.pause();
+              }
+            } else {
+              console.error("No se encontró el archivo de vídeo asociado al cuadro.");
+            }
           });
         }
       });
@@ -61,15 +66,16 @@
 
     <div id="bienvenida">
       <h1>Bienvenido a tu Galería VR</h1>
-      <p>Haz clic en el botón para activar los contenidos multimedia y los permisos del navegador.</p>
+      <p>Haz clic abajo para iniciar los permisos de vídeo.</p>
       <button id="btn-entrar" onclick="iniciarExperiencia()">ENTRAR A LA EXPERIENCIA</button>
     </div>
 
-    <a-assets>
-      <video id="miVideoUnico" src="tema1.mp4" loop="true" crossorigin="anonymous" playsinline muted="true"></video>
-    </a-assets>
-
     <a-scene cursor="rayOrigin: mouse">
+      
+      <a-assets>
+        <video id="miVideoUnico" src="tema1.mp4" loop="true" crossorigin="anonymous" playsinline muted="true"></video>
+      </a-assets>
+
       <a-entity id="camera-rig" position="0 0 0"><a-camera></a-camera></a-entity>
 
       <a-sky color="#222"></a-sky>
@@ -86,6 +92,7 @@
         <a-sky color="#1a331a"></a-sky>
         <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-2 2 -4"></a-entity>
         <a-entity geometry="primitive: box; width: 3; height: 2; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="2 2 -4"></a-entity>
+        
         <a-cone position="0 0.5 -3" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
         <a-text value="SALIR AL HUB" position="0 1 -3" align="center" width="4" color="white"></a-text>
       </a-entity>
@@ -95,6 +102,7 @@
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-3 2 -4"></a-entity>
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 -4"></a-entity>
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="3 2 -4"></a-entity>
+        
         <a-cone position="0 0.5 -3" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
         <a-text value="SALIR AL HUB" position="0 1 -3" align="center" width="4" color="white"></a-text>
       </a-entity>
@@ -105,6 +113,7 @@
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="0 2 4" rotation="0 180 0"></a-entity> 
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="-4 2 0" rotation="0 90 0"></a-entity> 
         <a-entity geometry="primitive: box; width: 2; height: 1.5; depth: 0.1" material="src: #miVideoUnico; shader: flat" play-on-click position="4 2 0" rotation="0 -90 0"></a-entity> 
+        
         <a-cone position="0 0.5 -2" radius-bottom="0.3" height="0.5" color="#ff3333" rotation="0 0 180" teleport="pos: 0 0 0"></a-cone>
         <a-text value="SALIR AL HUB" position="0 1 -2" align="center" width="4" color="white"></a-text>
       </a-entity>
