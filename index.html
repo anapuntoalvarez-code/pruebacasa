@@ -14,15 +14,27 @@
         }
       });
 
-      // Play/Pause al hacer clic
+     // Este es el nuevo código mejorado que vas a pegar
       AFRAME.registerComponent('play-on-click', {
         init: function () {
           this.el.addEventListener('click', () => {
             let v = document.querySelector(this.el.getAttribute('src'));
-            v.paused ? v.play() : v.pause();
+            
+            // Forzamos el silencio para que el navegador no lo bloquee
+            v.muted = true; 
+            
+            if (v.paused) {
+              v.play().then(() => {
+                console.log("¡Vídeo reproduciéndose!");
+              }).catch(err => {
+                console.error("Error al reproducir:", err);
+              });
+            } else {
+              v.pause();
+            }
           });
         }
-      });
+      }); 
     </script>
   </head>
   <body>
